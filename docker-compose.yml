@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: "postgres:18-alpine3.23"
+#    container_name: games-postgres # Assigns a fixed, human-readable name to the container instead of an auto-generated one. Note: using container_name can make scaling or running multiple copies harder because names must be unique.
+    environment:
+      POSTGRES_DB: gamesdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
+
+#Explanation:
+
+#version: '3.8'
+#
+#  Specifies the Compose file format version. 3.8 is compatible with modern Docker and Docker Compose. It’s not the Docker Engine version; it tells Compose which features/keys are valid.
+#services:
+#
+#  Top-level section where you define one or more containers (“services”) that will be run together.
+#
+#postgres:
+#
+#  The service name. It’s how other services in the same compose file would refer to this one (e.g., using the hostname “postgres” on the default network). It also appears in logs and docker compose commands.
+#
+#image: postgres:16
+#
+#  Tells Docker to use the official PostgreSQL image, tag 16 (major version 16). If not present locally, Docker will pull it from Docker Hub.
+#
+#container_name: games-postgres
+#
+#Assigns a fixed, human-readable name to the container instead of an auto-generated one. Note: using container_name can make scaling or running multiple copies harder because names must be unique.
+#
+#environment:
+#
+#Defines environment variables passed into the container. The official Postgres image reads these on first startup to initialize the database cluster:
+#
+#POSTGRES_DB: gamesdb
+#  Name of the default database to be created on initialization. If omitted, it defaults to the same value as POSTGRES_USER.
+#
+#POSTGRES_USER: postgres
+#  Name of the database superuser role that will be created. Here it’s set to “postgres” (the default superuser).
+#
+#POSTGRES_PASSWORD: postgres
+#  Password for the superuser. The Postgres image requires either a password or an explicit “trust” configuration; using a simple password like “postgres” is fine for local dev, but not secure for production.
+#
+#ports:
+#
+#  Publishes container ports to the host so you can connect from tools on your machine.
+#  "5432:5432"
+#  Maps host port 5432 to container port 5432 (Postgres defaults to 5432). With this, you can connect using localhost:5432. Be aware of conflicts if you already have a local Postgres server listening on 5432.
+#
+#volumes:
+#
+#  Mounts storage into the container.
+#  postgres-data:/var/lib/postgresql/data
+#  Attaches a named volume called “postgres-data” to the container path /var/lib/postgresql/data (the default PGDATA directory in the Postgres image). This persists your database files across container restarts and image updates.
+#
+#volumes: (top-level)
+#
+#  Declares named volumes managed by Docker. Here it defines the “postgres-data” volume used above.
+#postgres-data:
+#  Creates (or references, if it already exists) a named volume with default settings. Docker will store it in its managed volume location on your host.
+#Additional notes:
+#
+#  Docker Compose automatically creates a default network for the project. Services can reach each other via their service names, so other services could connect to this DB at host “postgres” port 5432.
+#  The initialization (creating the database and user) happens only on the first run when the PGDATA directory is empty. If the named volume already has data, the environment variables won’t reapply.
+#  For production, consider stronger passwords, not exposing ports directly (omit ports and use a private network), and possibly setting POSTGRES_INITDB_ARGS/PGDATA as needed.
